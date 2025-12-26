@@ -1,28 +1,31 @@
 const express = require("express");
-const { exec } = require("child_process");
+const cors = require("cors");
+const { ytdlp } = require("node-yt-dlp");
 const app = express();
 
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
 
-const PORT = process.env.PORT || 10000;
-
-app.post("/download", (req, res) => {
+app.post("/download", async (req, res) => {
   const url = req.body.url;
   if (!url) return res.status(400).send("No URL provided");
 
- exec(`/usr/local/bin/yt-dlp -g "${url}"`, (err, stdout, stderr) => {
-    if (err || !stdout.trim()) {
-        console.error("❌ yt-dlp error:", stderr);
-        return res.status(500).send("Server error: failed to fetch media.");
+  try {
+    const result = await ytdlp(url, { dumpSingleJson: true });
+
+    if (!result || !result.url) {
+      return res.status(500).send("Media not found (might be private)");
     }
-    res.send(stdout.trim());
+
+    return res.send(result.url);
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Server error: Unable to fetch media");
+  }
 });
 
-});
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log("🚀 Running on port", PORT));
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
 
