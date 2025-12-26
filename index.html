@@ -110,64 +110,19 @@
   </div>
 
 <script>
-async function go() {
-  const url = document.getElementById("url").value.trim();
-  const out = document.getElementById("out");
+async function downloadMedia() {
+  const url = document.getElementById("urlInput").value;
+  const res = await fetch(`/download?url=${encodeURIComponent(url)}`);
+  const data = await res.json();
 
-  if (!url) {
-    out.innerHTML = "<div class='error'>Please paste a link</div>";
-    return;
-  }
-
-  out.innerHTML = "⏳ Fetching media...";
-
-  try {
-    const res = await fetch("http://localhost:5000/api/download", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url })
-    });
-
-    const data = await res.json();
-    out.innerHTML = "";
-
-    // ✅ ZIP case (carousel)
-    if (data.zip) {
-      out.innerHTML = `
-        <a class="download" href="${data.zip}">
-          Download All (ZIP)
-        </a>
-      `;
-      return;
-    }
-
-    // ❌ no media
-    if (!data.media) {
-      out.innerHTML = "<div class='error'>Media not available</div>";
-      return;
-    }
-
-    // ✅ single media
-    data.media.forEach((m, i) => {
-      if (m.includes(".mp4")) {
-        out.innerHTML += `
-          <video controls src="${m}"></video>
-          <a class="download" href="${m}" download>Download Video</a>
-        `;
-      } else {
-        out.innerHTML += `
-          <img src="${m}">
-          <a class="download" href="${m}" download>Download Image</a>
-        `;
-      }
-    });
-
-  } catch (e) {
-    out.innerHTML = "<div class='error'>Server error</div>";
+  if (data.url) {
+    window.open(data.url, "_blank");
+  } else {
+    alert("❌ Error: " + (data.error || "Failed"));
   }
 }
 </script>
 
-
 </body>
 </html>
+
