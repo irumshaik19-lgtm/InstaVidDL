@@ -12,20 +12,23 @@ app.post("/download", async (req, res) => {
 
   try {
     const result = await ytdlp(url, { dumpSingleJson: true });
-    
+
     if (!result || !result.url) {
-      return res.status(500).send("Media not found (Maybe private?)");
+      return res.status(404).send("Media not found. (Maybe private?)");
     }
 
     return res.send(result.url);
+
   } catch (error) {
-    console.log("❌ ERROR:", error.stderr || error);
+    console.error("❌ yt-dlp error:", error.stderr || error);
     return res.status(500).send("Server error: failed to fetch media");
   }
 });
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log("🚀 Server running on port", PORT));
+
+
 
 
 
