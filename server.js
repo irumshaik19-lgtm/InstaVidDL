@@ -1,42 +1,43 @@
-const express = require("express");
-const axios = require("axios");
-const cors = require("cors");
+// ====== Instagram Downloader Server ======
+import express from "express";
+import cors from "cors";
+import instaDL from "instagram-url-direct";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ⬇️  ENTER YOUR VALUES HERE
-const API_URL = "https://social-media-video-downloader.p.rapidapi.com/youtube/v3/video/details";
-const API_KEY = "YOUR_RAPIDAPI_KEY_HERE";
-const API_HOST = "social-media-video-downloader.p.rapidapi.com";
-// ⬆️ Copy those from RapidAPI panel
-
 app.post("/download", async (req, res) => {
-  const videoUrl = req.body.url;
-  if (!videoUrl) return res.status(400).send("No URL provided");
-
   try {
-    const response = await axios.get(API_URL, {
-      params: {
-        url: videoUrl
-      },
-      headers: {
-        "X-RapidAPI-Key": API_KEY,
-        "X-RapidAPI-Host": API_HOST
-      }
+    const { url } = req.body;
+    if (!url) return res.status(400).json({ error: "No URL provided" });
+
+    console.log("📥 Requested URL:", url);
+
+    // Get Instagram media links (photo/video/reel)
+    const result = await instaDL(url);
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ error: "No media found" });
+    }
+
+    return res.json({
+      success: true,
+      media: result, // returns photo/reel/video direct links
     });
 
-    return res.json(response.data);
-
   } catch (error) {
-    console.error(error.response?.data || error);
-    return res.status(500).send("Server error: Could not fetch media.");
+    console.error("❌ Server Error:", error);
+    return res.status(500).json({ error: "Server error while processing request" });
   }
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.get("/", (req, res) => {
+  res.send("🚀 Instagram Downloader Server Running!");
+});
 
-
-
+// ====== PORT SETUP FOR RENDER ======
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server Running on PORT: ${PORT}`);
+});
