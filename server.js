@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { instagram } from "instagram-url-direct"; // <-- FIXED HERE
+import igdl from "instagram-url-direct"; // CORRECT IMPORT
 
 const app = express();
 app.use(cors());
@@ -11,18 +11,18 @@ app.get("/api/download", async (req, res) => {
     const { url } = req.query;
     if (!url) return res.status(400).json({ error: "No URL provided" });
 
-    const result = await instagram(url); // <-- Correct usage
+    const result = await igdl(url); 
+
     if (!result || !result.url_list?.length) {
       return res.status(404).json({ error: "No media found" });
     }
 
     res.json({ download: result.url_list[0] });
-  } catch (error) {
-    console.error("Server error:", error);
-    res.status(500).json({ error: "Server error", details: error.toString() });
+  } catch (err) {
+    console.error("ERROR:", err);
+    res.status(500).json({ error: "Failed to process URL" });
   }
 });
 
-// Render will inject PORT automatically
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port: ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
