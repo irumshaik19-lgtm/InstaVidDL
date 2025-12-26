@@ -12,15 +12,17 @@ app.post("/download", (req, res) => {
   const url = req.body.url;
   if (!url) return res.status(400).send("No URL provided");
 
-  exec(`yt-dlp -g "${url}"`, (err, stdout, stderr) => {
+ exec(`/usr/local/bin/yt-dlp -g "${url}"`, (err, stdout, stderr) => {
     if (err || !stdout.trim()) {
-      console.error(stderr);
-      return res.status(500).send("Server error: Failed to fetch media.");
+        console.error("❌ yt-dlp error:", stderr);
+        return res.status(500).send("Server error: failed to fetch media.");
     }
     res.send(stdout.trim());
-  });
+});
+
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
