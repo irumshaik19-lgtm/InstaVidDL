@@ -1,18 +1,13 @@
-const express = require("express");
-const path = require("path");
-const { exec } = require("child_process");
+const ytdlp = "yt-dlp"; // Linux binary
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+app.post("/download", (req, res) => {
+  const url = req.body.url;
+  if (!url) return res.status(400).send("No URL provided");
 
-app.use(express.urlencoded({extended:false}));
-app.use(express.json());
-app.use(express.static("public"));
-
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.listen(PORT, () => {
-    console.log("🚀 Server running on port:", PORT);
+  exec(`${ytdlp} -g "${url}"`, (error, stdout, stderr) => {
+    if (error || !stdout) {
+      return res.status(500).send("Failed to fetch media.");
+    }
+    return res.send(stdout.trim());
+  });
 });
