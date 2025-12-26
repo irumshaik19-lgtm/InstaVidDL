@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Instagram Downloader</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 80px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 15px;
+      font-size: 16px;
+      background: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0052cc;
+    }
+
+    #out {
+      margin-top: 25px;
+    }
+
+    video, img {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    a.download {
+      display: inline-block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: white;
+      background: #28a745;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 15px;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 12px;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Instagram Downloader</h1>
+    <p>Download Instagram reels, videos & photos</p>
+
+    <input id="url" placeholder="Paste Instagram link here">
+    <button onclick="go()">Download</button>
+
+    <div id="out"></div>
+
+    <footer>
+      © 2025 Instagram Downloader
+    </footer>
+  </div>
+
+<script>
+async function go() {
+  const url = document.getElementById("url").value.trim();
+  const out = document.getElementById("out");
+
+  if (!url) {
+    out.innerHTML = "<div class='error'>Please paste a link</div>";
+    return;
+  }
+
+  out.innerHTML = "⏳ Fetching media...";
+
+  try {
+    const res = await fetch("http://localhost:5000/api/download", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+
+    const data = await res.json();
+    out.innerHTML = "";
+
+    // ✅ ZIP case (carousel)
+    if (data.zip) {
+      out.innerHTML = `
+        <a class="download" href="${data.zip}">
+          Download All (ZIP)
+        </a>
+      `;
+      return;
+    }
+
+    // ❌ no media
+    if (!data.media) {
+      out.innerHTML = "<div class='error'>Media not available</div>";
+      return;
+    }
+
+    // ✅ single media
+    data.media.forEach((m, i) => {
+      if (m.includes(".mp4")) {
+        out.innerHTML += `
+          <video controls src="${m}"></video>
+          <a class="download" href="${m}" download>Download Video</a>
+        `;
+      } else {
+        out.innerHTML += `
+          <img src="${m}">
+          <a class="download" href="${m}" download>Download Image</a>
+        `;
+      }
+    });
+
+  } catch (e) {
+    out.innerHTML = "<div class='error'>Server error</div>";
+  }
+}
+</script>
+
+
+</body>
+</html>
