@@ -25,29 +25,22 @@
 
 <script>
 document.getElementById("downloadBtn").addEventListener("click", async () => {
-    const url = document.getElementById("videoURL").value.trim();
-    const statusMsg = document.getElementById("statusMsg");
+    const url = document.getElementById("urlInput").value;
+    const status = document.getElementById("status");
 
-    if (!url) {
-        statusMsg.innerHTML = "❌ Please enter a URL!";
-        return;
-    }
+    status.innerHTML = "⏳ Processing...";
 
-    statusMsg.innerHTML = "⏳ Fetching download link...";
+    const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
+    const data = await response.json();
 
-    try {
-        const res = await fetch(`https://insta-vid-dl-b4d1.vercel.app/api/server?url=${encodeURIComponent(url)}`);
-        const data = await res.json();
-
-        if (data.downloadUrl) {
-            statusMsg.innerHTML = `<a href="${data.downloadUrl}" target="_blank" style="color:green;font-weight:bold;">✅ Click here to download</a>`;
-        } else {
-            statusMsg.innerHTML = `❌ Error: ${data.error || "Could not fetch link"}`;
-        }
-    } catch (err) {
-        statusMsg.innerHTML = "❌ Server error. Try again later.";
+    if (data.download_url) {
+        window.open(data.download_url, "_blank");
+        status.innerHTML = "✅ Download Ready!";
+    } else {
+        status.innerHTML = "❌ Server error. Try again later.";
     }
 });
 </script>
+
 </body>
 </html>
