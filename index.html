@@ -1,128 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Instagram Downloader</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instagram Downloader</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      margin: 0;
-      padding: 0;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 80px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-top: 20px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 15px;
-      font-size: 16px;
-      background: #0066ff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0052cc;
-    }
-
-    #out {
-      margin-top: 25px;
-    }
-
-    video, img {
-      width: 100%;
-      max-width: 100%;
-      border-radius: 8px;
-      margin-top: 15px;
-    }
-
-    a.download {
-      display: inline-block;
-      margin-top: 10px;
-      text-decoration: none;
-      color: white;
-      background: #28a745;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-    .error {
-      color: red;
-      margin-top: 15px;
-    }
-
-    footer {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #aaa;
-    }
-  </style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0px 5px 20px rgba(0,0,0,0.12);
+        }
+        input {
+            width: 95%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        button {
+            width: 100%;
+            background: #0066ff;
+            border: none;
+            padding: 14px;
+            font-size: 18px;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background: #0047cc; }
+        #result {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
+    <div class="container">
+        <h1>📥 Instagram Downloader</h1>
+        <p>Download Instagram reels, videos & images</p>
 
-  <div class="container">
-    <h1>Instagram Downloader</h1>
-    <p>Download Instagram reels, videos & photos</p>
+        <input type="text" id="urlInput" placeholder="Paste Instagram link here..." />
 
-    <input id="url" placeholder="Paste Instagram link here">
-    <button onclick="go()">Download</button>
+        <button onclick="downloadMedia()">Download</button>
 
-    <div id="out"></div>
-
-    <footer>
-      © 2025 Instagram Downloader
-    </footer>
-  </div>
+        <p id="result"></p>
+    </div>
 
 <script>
-async function downloadMedia() {
-  const url = document.getElementById("urlInput").value;
-  const res = await fetch(`/download?url=${encodeURIComponent(url)}`);
-  const data = await res.json();
+    const backendURL = "https://instaviddl.onrender.com/download?url=";
 
-  if (data.url) {
-    window.open(data.url, "_blank");
-  } else {
-    alert("❌ Error: " + (data.error || "Failed"));
-  }
-}
+    async function downloadMedia() {
+        const inputURL = document.getElementById("urlInput").value;
+        const resultBox = document.getElementById("result");
+
+        if (!inputURL.trim()) {
+            resultBox.innerHTML = "❌ Please enter a URL";
+            return;
+        }
+
+        resultBox.innerHTML = "⏳ Fetching link... please wait";
+
+        try {
+            const response = await fetch(backendURL + encodeURIComponent(inputURL));
+            const data = await response.json();
+
+            if (data.error) {
+                resultBox.innerHTML = "❌ Error: " + data.error;
+                return;
+            }
+
+            // Show download link
+            resultBox.innerHTML = `
+                <a href="${data.download_url}" download
+                   style="padding:12px 20px;background:#00b140;color:white;border-radius:6px;display:inline-block;margin-top:10px;text-decoration:none;">
+                   ⬇ Click here to Download Media
+                </a>
+            `;
+        } catch (error) {
+            resultBox.innerHTML = "❌ Server Error. Try again.";
+        }
+    }
 </script>
 
 </body>
 </html>
+
 
