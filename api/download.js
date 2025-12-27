@@ -1,14 +1,10 @@
-// api/download.js
 import axios from "axios";
 
 export default async function handler(req, res) {
-  const reelUrl = req.query.url;
-
-  if (!reelUrl) {
-    return res.status(400).json({ status: "error", message: "❌ URL is required" });
-  }
-
   try {
+    const reelUrl = req.query.url;
+    if (!reelUrl) return res.status(400).json({ error: "Instagram URL required" });
+
     const response = await axios.get(
       "https://instagram-reels-downloader-api.p.rapidapi.com/downloadReel",
       {
@@ -20,22 +16,12 @@ export default async function handler(req, res) {
       }
     );
 
-    // Check if valid data exists
-    if (!response.data || !response.data.data) {
-      return res.status(500).json({ status: "error", message: "Invalid response from API" });
-    }
+    return res.status(200).json(response.data);
 
-    return res.status(200).json({
-      status: "success",
-      data: response.data.data,
-    });
-
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
-      status: "error",
-      message: "Server failed to fetch",
-      details: err.response?.data || err.message,
+      error: "API request failed",
+      details: error.response?.data || error.message,
     });
   }
 }
-
