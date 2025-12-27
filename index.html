@@ -23,33 +23,29 @@ button:hover{background:#005fcc}
 
 <script>
 document.getElementById("downloadBtn").addEventListener("click", async () => {
-    const url = document.getElementById("urlInput").value.trim();
-    const result = document.getElementById("result");
-    
-    if (!url) {
-        result.innerHTML = "❌ Please paste an Instagram link";
-        return;
-    }
-    
-    result.innerHTML = "⏳ Fetching download link...";
+  const url = document.getElementById("urlInput").value.trim();
+  const result = document.getElementById("result");
 
-    try {
-        const response = await fetch(`https://instaviddl.onrender.com/download?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
+  if (!url) return result.innerHTML = "❌ Please enter a link";
 
-        if (data.download_url) {
-            result.innerHTML = `
-                <a href="${data.download_url}" class="download-link" download target="_blank">
-                    ⬇️ Click here to download
-                </a>`;
-        } else {
-            result.innerHTML = `❌ Server error: ${data.error || "Try another link"}`;
-        }
-    } catch (error) {
-        result.innerHTML = "❌ Network error. Try again.";
+  result.innerHTML = "⏳ Processing link...";
+
+  try {
+    const res = await fetch(`https://instaviddl.onrender.com/download?url=${encodeURIComponent(url)}`);
+    const data = await res.json();
+
+    if (data.download_url) {
+      result.innerHTML = `<a href="${data.download_url}" download target="_blank">⬇️ Download Video</a>`;
+    } else {
+      result.innerHTML = "❌ Failed. Try another link.";
     }
+
+  } catch {
+    result.innerHTML = "❌ Network issue.";
+  }
 });
 </script>
+
 
 </body>
 </html>
