@@ -1,1 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InstaVidDL - Instagram Downloader</title>
+<style>
+    body { font-family: Arial, sans-serif; background:#f2f4f8; margin:0; padding:0; display:flex; justify-content:center; align-items:center; height:100vh; }
+    .container { background:white; padding:30px; width:500px; border-radius:12px; box-shadow:0 5px 20px rgba(0,0,0,0.1); text-align:center; }
+    h1 { font-size:26px; margin-bottom:10px; }
+    input { width:95%; padding:12px; border-radius:8px; border:1px solid #ccc; outline:none; }
+    button { width:100%; background:#0066ff; color:white; padding:14px; margin-top:15px; border:0; border-radius:8px; cursor:pointer; font-size:16px; }
+    button:hover { background:#0051cc; }
+    .error { color:#d00000; margin-top:10px; }
+    .download-box { margin-top:20px; padding:15px; background:#e8f1ff; border-radius:10px; }
+    a { background:#0a880a; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; display:inline-block; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📥 InstaVidDL</h1>
+    <p>Download Instagram Reels, Videos & Photos</p>
+    
+    <input type="text" id="instaUrl" placeholder="Paste Instagram Reel URL here">
+    <button onclick="downloadMedia()">Download</button>
+    
+    <p class="error" id="error"></p>
+    <div id="result"></div>
+</div>
+
+<script>
+async function downloadMedia() {
+    const url = document.getElementById("instaUrl").value.trim();
+    const error = document.getElementById("error");
+    const result = document.getElementById("result");
+    
+    if(!url){ error.textContent = "❌ Please enter a URL"; return; }
+    error.textContent = "⏳ Processing... Please wait";
+    result.innerHTML = "";
+
+    try {
+        // IMPORTANT: Replace with your Vercel URL 👇
+        const API = "https://insta-vid-dl-b4d1.vercel.app/api/server";
+        const response = await fetch(`${API}?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+
+        if(data?.url){
 
