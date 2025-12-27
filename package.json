@@ -5,10 +5,10 @@
   "scripts": {
     "start": "node server.js"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "axios": "^1.6.0",
-    "instagram-downloader": "github:iuricode/instagram-downloader" 
-  }
+ "dependencies": {
+  "express": "^4.18.2",
+  "cors": "^2.8.5",
+  "axios": "^1.6.0",
+  "instagram-url-direct": "^2.0.1"
+}
 }
