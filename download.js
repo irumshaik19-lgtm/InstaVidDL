@@ -1,29 +1,18 @@
-<script>
-async function downloadMedia() {
-    const url = document.getElementById("instaUrl").value.trim();
-    const error = document.getElementById("error");
-    const result = document.getElementById("result");
-
-    if(!url){ error.textContent = "❌ Please enter a URL"; return; }
-    error.textContent = "⏳ Fetching download link...";
+document.getElementById("downloadBtn").addEventListener("click", async () => {
+    let url = document.getElementById("inputUrl").value.trim();
+    if (!url) return alert("⚠️ Enter Instagram URL!");
 
     try {
-        const API = "https://insta-vid-dl-b4d1.vercel.app/api/server";
-        const response = await fetch(`${API}?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
+        const res = await fetch(`https://insta-vid-dl-b4d1.vercel.app/api/download?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
 
-        if(data.url){
-            error.textContent = "";
-            result.innerHTML = `
-                <div class="download-box">
-                    <h3>✅ Download Ready!</h3>
-                    <a href="${data.url}" target="_blank">⬇ Download Video</a>
-                </div>`;
+        if (data.status === "success" && data.download) {
+            window.open(data.download, "_blank");
         } else {
-            error.textContent = "❌ Not able to fetch this link. Try another.";
+            alert("❌ Error: " + (data.message || "Try another link"));
         }
-    } catch {
-        error.textContent = "❌ Server error. Check Vercel logs.";
+    } catch (error) {
+        alert("❌ Server error. Try again later.");
+        console.error(error);
     }
-}
-</script>
+});
