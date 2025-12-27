@@ -59,40 +59,34 @@
     <input type="text" id="instaUrl" placeholder="Paste Instagram link here..." />
 
     <button id="download-btn">Download</button>
-
     <p class="error" id="errorMsg"></p>
   </div>
 
-  <script>
-    const btn = document.getElementById("download-btn");
-    const errorMsg = document.getElementById("errorMsg");
+<script>
+async function downloadMedia() {
+  const input = document.getElementById("instaUrl").value.trim();
+  const status = document.getElementById("status");
 
-    btn.addEventListener("click", async () => {
-      const url = document.getElementById("instaUrl").value.trim();
-      errorMsg.textContent = "";
+  if (!input) return status.innerHTML = "⚠️ Please paste a link first.";
 
-      if (!url) {
-        errorMsg.textContent = "❌ Please paste a link first!";
-        return;
-      }
+  status.innerHTML = "⏳ Fetching download link...";
 
-      btn.innerText = "Fetching...";
+  try {
+    const request = await fetch(`/api/download?url=${encodeURIComponent(input)}`);
+    const result = await request.json();
 
-      try {
-        const res = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
-        const data = await res.json();
+    if (result.success) {
+      status.innerHTML = "⬇️ Downloading...";
+      window.location.href = result.download;
+    } else {
+      status.innerHTML = "❌ Failed to fetch media. Try different link.";
+    }
+    
+  } catch {
+    status.innerHTML = "❌ API request failed. Try again.";
+  }
+}
+</script>
 
-        if (data?.data?.url) {
-          window.open(data.data.url, "_blank");
-        } else {
-          errorMsg.textContent = "❌ API request failed. Try again.";
-        }
-      } catch (error) {
-        errorMsg.textContent = "❌ Server error. Try again later.";
-      }
-
-      btn.innerText = "Download";
-    });
-  </script>
 </body>
 </html>
