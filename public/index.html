@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>InstaVidDL</title>
-<style>
-/* simple UI styling */
-body{font-family:Arial, sans-serif;background:#eaf1ff;display:flex;justify-content:center;align-items:center;height:100vh;}
-.container{background:#fff;padding:40px;border-radius:15px;text-align:center;width:500px;box-shadow:0 4px 20px rgba(0,0,0,0.1);}
-input{width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:15px;}
-button{width:100%;background:#0066ff;color:white;border:none;padding:12px;border-radius:8px;font-size:18px;cursor:pointer;}
-.error{color:red;margin-top:10px;}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InstaVidDL</title>
+  <style>
+    body {font-family:Arial,sans-serif;background:#eef4ff;display:flex;justify-content:center;align-items:center;height:100vh;}
+    .card {background:white;padding:35px;border-radius:12px;width:480px;box-shadow:0 4px 18px rgba(0,0,0,0.1);text-align:center;}
+    input {width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:15px;}
+    button {width:100%;padding:13px;border:none;border-radius:8px;background:#0066ff;color:#fff;font-size:18px;cursor:pointer;}
+    button:hover {background:#004bb5;}
+    .message {margin-top:15px;color:#d00000;}
+  </style>
 </head>
-
 <body>
-<div class="container">
-<h2>📥 InstaVidDL</h2>
-<p>Download Instagram Reels, Videos & Photos</p>
+  <div class="card">
+    <h2>📥 InstaVidDL</h2>
+    <p>Download Instagram Reels, Videos & Photos</p>
+    <input type="text" id="instaUrl" placeholder="Paste Instagram Reel URL here..." />
+    <button onclick="downloadVideo()">Download</button>
+    <p class="message" id="message"></p>
+  </div>
 
-<input id="instaUrl" placeholder="Paste Instagram link here...">
-<button onclick="download()">Download</button>
-<p id="message" class="error"></p>
-</div>
-
-<script>
-async function download(){
-    const input = document.getElementById("instaUrl").value;
+  <script>
+  async function downloadVideo() {
+    const url = document.getElementById("instaUrl").value.trim();
     const message = document.getElementById("message");
+
+    if (!url) {
+      message.textContent = "❌ Please enter a link";
+      return;
+    }
+
     message.textContent = "⏳ Fetching download link...";
 
     try {
-        const res = await fetch(`/api/index?url=${encodeURIComponent(input)}`);
-        const data = await res.json();
+      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
 
-        if(data.status === "success") {
-            window.open(data.download, "_blank");
-            message.textContent = "";
-        } else {
-            message.textContent = "❌ Could not fetch video. Try again.";
-        }
-
-    } catch {
-        message.textContent = "❌ API request failed. Try again.";
+      if (data.status === "success" && data.data?.url) {
+        message.textContent = "";
+        window.open(data.data.url, "_blank");
+      } else {
+        message.textContent = "❌ Failed to fetch download link";
+      }
+    } catch (e) {
+      message.textContent = "❌ API request failed.";
     }
-}
-
-</script>
+  }
+  </script>
 </body>
 </html>
