@@ -1,7 +1,6 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/download", "destination": "/api/download.js" },
-    { "source": "/download/(.*)", "destination": "/api/download.js" }
-  ]
+  "builds": [{ "src": "server.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "/server.js" }]
 }
+
