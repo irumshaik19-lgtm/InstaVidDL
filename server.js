@@ -7,33 +7,34 @@ import { fileURLToPath } from "url";
 const app = express();
 app.use(cors());
 
-// Needed to get the correct file path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve the homepage (index.html)
+// Serve HTML
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// API Endpoint
+// Instagram Downloader API
 app.get("/download", async (req, res) => {
   const videoURL = req.query.url;
   if (!videoURL) return res.json({ error: "❌ No URL provided" });
 
   try {
-    const api = `https://ssyoutube.com/api/convert?url=${encodeURIComponent(videoURL)}`;
+    const api = `https://saveig.app/api/ajax?url=${encodeURIComponent(videoURL)}`;
     const response = await axios.get(api);
 
-    if (!response.data.url) return res.json({ error: "❌ Could not fetch download link" });
+    if (!response.data?.url) {
+      return res.json({ error: "❌ Failed to fetch. Try another IG link" });
+    }
 
     res.json({
       download_url: response.data.url,
-      message: "Download link generated successfully"
+      message: "Download link ready 🎉"
     });
 
-  } catch (error) {
-    res.json({ error: "❌ Server error. Try another link" });
+  } catch {
+    res.json({ error: "❌ Server error. Try again later." });
   }
 });
 
