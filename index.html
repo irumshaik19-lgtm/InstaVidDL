@@ -23,7 +23,8 @@ button:hover{background:#005fcc}
 
 <script>
 document.getElementById("downloadBtn").addEventListener("click", async () => {
-  const api = "https://instaviddl.onrender.com/download?url=" + encodeURIComponent(urlValue);
+const apiURL = `https://instaviddl.onrender.com/download?url=${encodeURIComponent(url)}`;
+
   const url = document.getElementById("urlInput").value.trim();
   const result = document.getElementById("result");
 
