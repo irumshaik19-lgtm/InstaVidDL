@@ -1,1 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>InstaVidDL - Instagram Downloader</title>
+</head>
+<body>
+<h2>Instagram Reels / Video Downloader</h2>
+<input id="link" placeholder="Paste Instagram link here">
+<button onclick="download()">Download</button>
+<p id="msg"></p>
+
+<script>
+async function download() {
+    const url = document.getElementById("link").value;
+    const res = await fetch("http://72.61.244.250:3000/download", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+    document.getElementById("msg").innerText = JSON.stringify(data);
+}
+</script>
+</body>
+</html>
 
