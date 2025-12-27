@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insta Downloader</title>
+<style>
+body{font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;background:#fafafa}
+.box{background:#fff;padding:30px;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,0.1);text-align:center;width:350px}
+input,button{width:100%;padding:12px;margin:10px 0;border-radius:6px;border:1px solid #ddd}
+button{background:#007bff;color:#fff;border:none;cursor:pointer}
+button:hover{background:#005fcc}
+#result{margin-top:10px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>📥 Insta Downloader</h2>
+<input id="link" placeholder="Paste Instagram link">
+<button onclick="go()">Download</button>
+<div id="result"></div>
+</div>
+
+<script>
+const form = document.querySelector(".download-form");
+const input = document.querySelector(".input-box");
+const result = document.querySelector(".result");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const reelUrl = input.value.trim();
+  if (!reelUrl) return alert("❌ Enter a link");
+
+  try {
+    result.innerHTML = "⏳ Processing... wait...";
+    
+    const res = await fetch(`https://instaviddl.onrender.com/download?url=${encodeURIComponent(reelUrl)}`);
+    const data = await res.json();
+
+    if (!data.download_url) {
+      result.innerHTML = "❌ Failed to get link. Try another.";
+      return;
+    }
+
+    result.innerHTML = `<a href="${data.download_url}" class="btn" download>⬇️ Click to Download</a>`;
+  } catch {
+    result.innerHTML = "❌ Server error, try again.";
+  }
+});
+</script>
+
+</body>
+</html>
