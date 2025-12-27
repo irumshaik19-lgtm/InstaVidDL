@@ -3,51 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>InstaVidDL</title>
+  <title>InstaVidDL - Instagram Downloader</title>
   <style>
-    body {font-family:Arial,sans-serif;background:#eef4ff;display:flex;justify-content:center;align-items:center;height:100vh;}
-    .card {background:white;padding:35px;border-radius:12px;width:480px;box-shadow:0 4px 18px rgba(0,0,0,0.1);text-align:center;}
-    input {width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:15px;}
-    button {width:100%;padding:13px;border:none;border-radius:8px;background:#0066ff;color:#fff;font-size:18px;cursor:pointer;}
-    button:hover {background:#004bb5;}
-    .message {margin-top:15px;color:#d00000;}
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef3ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 500px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      background: #0069ff;
+      padding: 15px;
+      border: none;
+      margin-top: 15px;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background: #0052cc;
+    }
+    .error {
+      color: red;
+      margin-top: 12px;
+      font-size: 15px;
+    }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h2>📥 InstaVidDL</h2>
+  <div class="container">
+    <h2>🚀 InstaVidDL</h2>
     <p>Download Instagram Reels, Videos & Photos</p>
-    <input type="text" id="instaUrl" placeholder="Paste Instagram Reel URL here..." />
-    <button onclick="downloadVideo()">Download</button>
-    <p class="message" id="message"></p>
+
+    <input type="text" id="instaUrl" placeholder="Paste Instagram link here..." />
+
+    <button id="download-btn">Download</button>
+
+    <p class="error" id="errorMsg"></p>
   </div>
 
   <script>
-  async function downloadVideo() {
-    const url = document.getElementById("instaUrl").value.trim();
-    const message = document.getElementById("message");
+    const btn = document.getElementById("download-btn");
+    const errorMsg = document.getElementById("errorMsg");
 
-    if (!url) {
-      message.textContent = "❌ Please enter a link";
-      return;
-    }
+    btn.addEventListener("click", async () => {
+      const url = document.getElementById("instaUrl").value.trim();
+      errorMsg.textContent = "";
 
-    message.textContent = "⏳ Fetching download link...";
-
-    try {
-      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
-
-      if (data.status === "success" && data.data?.url) {
-        message.textContent = "";
-        window.open(data.data.url, "_blank");
-      } else {
-        message.textContent = "❌ Failed to fetch download link";
+      if (!url) {
+        errorMsg.textContent = "❌ Please paste a link first!";
+        return;
       }
-    } catch (e) {
-      message.textContent = "❌ API request failed.";
-    }
-  }
+
+      btn.innerText = "Fetching...";
+
+      try {
+        const res = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        if (data?.data?.url) {
+          window.open(data.data.url, "_blank");
+        } else {
+          errorMsg.textContent = "❌ API request failed. Try again.";
+        }
+      } catch (error) {
+        errorMsg.textContent = "❌ Server error. Try again later.";
+      }
+
+      btn.innerText = "Download";
+    });
   </script>
 </body>
 </html>
