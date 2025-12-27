@@ -1,49 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>InstaVidDL - Instagram Downloader</title>
 <style>
-    body { font-family: Arial, sans-serif; background:#f2f4f8; margin:0; padding:0; display:flex; justify-content:center; align-items:center; height:100vh; }
-    .container { background:white; padding:30px; width:500px; border-radius:12px; box-shadow:0 5px 20px rgba(0,0,0,0.1); text-align:center; }
-    h1 { font-size:26px; margin-bottom:10px; }
-    input { width:95%; padding:12px; border-radius:8px; border:1px solid #ccc; outline:none; }
-    button { width:100%; background:#0066ff; color:white; padding:14px; margin-top:15px; border:0; border-radius:8px; cursor:pointer; font-size:16px; }
-    button:hover { background:#0051cc; }
-    .error { color:#d00000; margin-top:10px; }
-    .download-box { margin-top:20px; padding:15px; background:#e8f1ff; border-radius:10px; }
-    a { background:#0a880a; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; display:inline-block; }
+    body { font-family: Arial, sans-serif; background: #eef3ff; margin:0; padding:0; display:flex; justify-content:center; align-items:center; height:100vh; }
+    .card { background:white; padding:40px; width:500px; border-radius:20px; box-shadow:0 5px 20px rgba(0,0,0,0.1); text-align:center; }
+    input { width:100%; padding:12px; border-radius:8px; border:1px solid #ccc; margin-bottom:15px;}
+    button { width:100%; background:#0066ff; color:white; padding:12px; border:none; border-radius:8px; font-size:18px; cursor:pointer; }
+    button:hover { background:#004bbb; }
+    #statusMsg { margin-top:15px; font-size:16px; }
 </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>📥 InstaVidDL</h1>
+<div class="card">
+    <h2>📥 <strong>InstaVidDL</strong></h2>
     <p>Download Instagram Reels, Videos & Photos</p>
-    
-    <input type="text" id="instaUrl" placeholder="Paste Instagram Reel URL here">
-    <button onclick="downloadMedia()">Download</button>
-    
-    <p class="error" id="error"></p>
-    <div id="result"></div>
+
+    <input type="text" id="videoURL" placeholder="Paste Instagram link here..." />
+    <button id="downloadBtn">Download</button>
+    <div id="statusMsg"></div>
 </div>
 
 <script>
-async function downloadMedia() {
-    const url = document.getElementById("instaUrl").value.trim();
-    const error = document.getElementById("error");
-    const result = document.getElementById("result");
-    
-    if(!url){ error.textContent = "❌ Please enter a URL"; return; }
-    error.textContent = "⏳ Processing... Please wait";
-    result.innerHTML = "";
+document.getElementById("downloadBtn").addEventListener("click", async () => {
+    const url = document.getElementById("videoURL").value.trim();
+    const statusMsg = document.getElementById("statusMsg");
+
+    if (!url) {
+        statusMsg.innerHTML = "❌ Please enter a URL!";
+        return;
+    }
+
+    statusMsg.innerHTML = "⏳ Fetching download link...";
 
     try {
-        // IMPORTANT: Replace with your Vercel URL 👇
-        const API = "https://insta-vid-dl-b4d1.vercel.app/api/server";
-        const response = await fetch(`${API}?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
+        const res = await fetch(`https://insta-vid-dl-b4d1.vercel.app/api/server?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
 
-        if(data?.url){
-
+        if (data.downloadUrl) {
+            statusMsg.innerHTML = `<a href="${data.downloadUrl}" target="_blank" style="color:green;font-weight:bold;">✅ Click here to download</a>`;
+        } else {
+            statusMsg.innerHTML = `❌ Error: ${data.error || "Could not fetch link"}`;
+        }
+    } catch (err) {
+        statusMsg.innerHTML = "❌ Server error. Try again later.";
+    }
+});
+</script>
+</body>
+</html>
