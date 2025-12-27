@@ -1,32 +1,29 @@
-// Vercel Serverless API for Instagram Downloader
-import axios from "axios";
+<script>
+async function downloadMedia() {
+    const url = document.getElementById("instaUrl").value.trim();
+    const error = document.getElementById("error");
+    const result = document.getElementById("result");
 
-export default async function handler(req, res) {
-  const url = req.query.url;
+    if(!url){ error.textContent = "❌ Please enter a URL"; return; }
+    error.textContent = "⏳ Fetching download link...";
 
-  if (!url) return res.status(400).json({ error: "❌ No URL provided" });
+    try {
+        const API = "https://insta-vid-dl-b4d1.vercel.app/api/server";
+        const response = await fetch(`${API}?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
 
-  try {
-    // Instagram request headers to avoid 403
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept-Language": "en-US,en;q=0.9",
-      }
-    });
-
-    // Here we return HTML (page source) for now
-    // We can extract media URL next
-    return res.status(200).json({
-      status: "success",
-      message: "Fetched successfully!",
-      data: response.data.slice(0, 200) + "...(trimmed)"
-    });
-
-  } catch (err) {
-    return res.status(500).json({
-      error: "❌ Fetch failed",
-      details: err.message
-    });
-  }
+        if(data.url){
+            error.textContent = "";
+            result.innerHTML = `
+                <div class="download-box">
+                    <h3>✅ Download Ready!</h3>
+                    <a href="${data.url}" target="_blank">⬇ Download Video</a>
+                </div>`;
+        } else {
+            error.textContent = "❌ Not able to fetch this link. Try another.";
+        }
+    } catch {
+        error.textContent = "❌ Server error. Check Vercel logs.";
+    }
 }
+</script>
