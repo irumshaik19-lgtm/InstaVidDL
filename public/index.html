@@ -24,23 +24,22 @@
 </div>
 
 <script>
-document.getElementById("downloadBtn").addEventListener("click", async () => {
-    const url = document.getElementById("urlInput").value;
-    const status = document.getElementById("status");
+async function downloadVideo() {
+    const input = document.getElementById("urlInput").value.trim();
+    if (!input) return alert("❌ Enter a URL first!");
 
-    status.innerHTML = "⏳ Processing...";
-
-    const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
+    const response = await fetch(`/api?url=${encodeURIComponent(input)}`);
     const data = await response.json();
 
-    if (data.download_url) {
-        window.open(data.download_url, "_blank");
-        status.innerHTML = "✅ Download Ready!";
-    } else {
-        status.innerHTML = "❌ Server error. Try again later.";
+    if (!data || data.error) {
+        alert("❌ Failed to fetch. Try again.");
+        return;
     }
-});
+
+    window.open(data.data.video, "_blank"); // open the video file
+}
 </script>
+
 
 </body>
 </html>
