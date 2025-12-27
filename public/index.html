@@ -28,26 +28,24 @@ button{width:100%;background:#0066ff;color:white;border:none;padding:12px;border
 async function download(){
     const input = document.getElementById("instaUrl").value;
     const message = document.getElementById("message");
-
-    if(!input) return message.textContent = "❌ Please paste a link.";
-
-    message.textContent = "⏳ Fetching...";
+    message.textContent = "⏳ Fetching download link...";
 
     try {
-        const response = await fetch(`/api/index?url=${encodeURIComponent(input)}`);
-        const data = await response.json();
+        const res = await fetch(`/api/index?url=${encodeURIComponent(input)}`);
+        const data = await res.json();
 
-        if(data.status === "success"){
-            window.open(data.data.url, "_blank"); // open video download link
+        if(data.status === "success") {
+            window.open(data.download, "_blank");
             message.textContent = "";
         } else {
-            message.textContent = "❌ Error: Could not fetch video.";
+            message.textContent = "❌ Could not fetch video. Try again.";
         }
 
-    } catch (err) {
+    } catch {
         message.textContent = "❌ API request failed. Try again.";
     }
 }
+
 </script>
 </body>
 </html>
