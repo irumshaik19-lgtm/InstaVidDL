@@ -30,22 +30,33 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const reelUrl = input.value.trim();
-  if (!reelUrl) return alert("❌ Enter a link");
+  if (!reelUrl) {
+    result.innerHTML = "❌ Please enter a link";
+    return;
+  }
+
+  result.innerHTML = "⏳ Processing… Please wait…";
 
   try {
-    result.innerHTML = "⏳ Processing... wait...";
-    
-    const res = await fetch(`https://instaviddl.onrender.com/download?url=${encodeURIComponent(reelUrl)}`);
-    const data = await res.json();
+    const apiURL = `https://instaviddl.onrender.com/download?url=${encodeURIComponent(reelUrl)}`;
+    const response = await fetch(apiURL);
+    const data = await response.json();
 
-    if (!data.download_url) {
-      result.innerHTML = "❌ Failed to get link. Try another.";
+    console.log("API Response:", data);
+
+    if (!data || !data.download_url) {
+      result.innerHTML = "❌ Unable to fetch download link (try another link).";
       return;
     }
 
-    result.innerHTML = `<a href="${data.download_url}" class="btn" download>⬇️ Click to Download</a>`;
-  } catch {
-    result.innerHTML = "❌ Server error, try again.";
+    result.innerHTML = `
+      <a href="${data.download_url}" class="btn" download>
+        ⬇️ Click here to Download
+      </a>
+    `;
+  } catch (error) {
+    console.error("Download Error:", error);
+    result.innerHTML = "❌ Server error. Try again.";
   }
 });
 </script>
