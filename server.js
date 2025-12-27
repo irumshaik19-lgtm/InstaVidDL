@@ -1,41 +1,41 @@
 import express from "express";
 import cors from "cors";
 import axios from "axios";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
-app.use(express.json());
 
-// ====== Instagram Download API ======
-const API_URL = "https://instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com/index";
-const API_HOST = "instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com";
-const API_KEY = "YOUR_RAPIDAPI_KEY_HERE"; // ⚠️ paste your RapidAPI key here
+// Needed to get the correct file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Serve the homepage (index.html)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// API Endpoint
 app.get("/download", async (req, res) => {
-  const url = req.query.url;
-  if (!url) return res.json({ error: "❌ No URL provided" });
+  const videoURL = req.query.url;
+  if (!videoURL) return res.json({ error: "❌ No URL provided" });
 
   try {
-    const response = await axios.get(API_URL, {
-      params: { url },
-      headers: {
-        "X-RapidAPI-Key": API_KEY,
-        "X-RapidAPI-Host": API_HOST
-      }
+    const api = `https://ssyoutube.com/api/convert?url=${encodeURIComponent(videoURL)}`;
+    const response = await axios.get(api);
+
+    if (!response.data.url) return res.json({ error: "❌ Could not fetch download link" });
+
+    res.json({
+      download_url: response.data.url,
+      message: "Download link generated successfully"
     });
 
-    return res.json(response.data);
   } catch (error) {
-    console.error(error);
-    return res.json({ error: "⚠ Server failed. URL might be private/blocked." });
+    res.json({ error: "❌ Server error. Try another link" });
   }
 });
 
-// ====== Home Route (Fixes 'Cannot GET /') ======
-app.get("/", (req, res) => {
-  res.send("🚀 Insta Downloader Server Running Successfully!");
-});
-
-// ====== Render / Production Port ======
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`🚀 Server started on PORT: ${PORT}`));
