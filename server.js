@@ -5,37 +5,32 @@ import axios from "axios";
 const app = express();
 app.use(cors());
 
-const API_KEY = "6b00492dd5msh9acc1e3a9e2b0f2p159605jsncad9b423229c"; // PUT YOUR KEY
-const API_HOST = "instagram-reels-downloader-api.p.rapidapi.com"; // HOST FROM RAPIDAPI
+const PORT = process.env.PORT || 10000;
+
+// ⬅️ REPLACE THESE WITH YOUR OWN KEYS
+const RAPID_URL = "https://instagram-reels-downloader-api.p.rapidapi.com/download";
+const RAPID_KEY = "6b00492dd5msh9acc1e3a9e2b0f2p159605jdnscad9b423229c"; // your key
+const RAPID_HOST = "instagram-reels-downloader-api.p.rapidapi.com";
 
 app.get("/", (req, res) => {
-  res.send("🚀 InstaVidDL API Live & Running for Public Use!");
+  res.send("🚀 InstaVidDL API Live & Working!");
 });
 
 app.get("/download", async (req, res) => {
-  const reelURL = req.query.url;
-  if (!reelURL) return res.json({ error: "❌ No URL provided" });
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: "❌ No URL provided" });
 
   try {
-    const response = await axios.get(
-      `https://${API_HOST}/download?url=${encodeURIComponent(reelURL)}`,
-      {
-        headers: {
-          "x-rapidapi-key": API_KEY,
-          "x-rapidapi-host": API_HOST,
-        },
+    const response = await axios.get(`${RAPID_URL}?url=${encodeURIComponent(url)}`, {
+      headers: {
+        "x-rapidapi-key": RAPID_KEY,
+        "x-rapidapi-host": RAPID_HOST
       }
-    );
-
-    return res.json({ status: "success", data: response.data });
-  } catch (error) {
-    return res.json({
-      status: "error",
-      message: "❌ Failed to fetch",
-      details: error.response?.status || error.message,
     });
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: "❌ Server error", details: error.message });
   }
 });
 
-const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`🚀 Server running on PORT ${PORT}`));
